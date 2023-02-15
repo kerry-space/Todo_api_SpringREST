@@ -5,13 +5,19 @@ import com.example.todo_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Map;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/user")
+
+@Validated
 public class UserController {
 
 
@@ -30,7 +36,7 @@ public class UserController {
     //Create(C)
     //@RequestMapping(path = "/", method = RequestMethod.POST) old annotation
     @PostMapping("/")
-    public ResponseEntity<UserDto> register(@RequestBody UserDto dto){
+    public ResponseEntity<UserDto> register(@RequestBody @Valid UserDto dto){
         if (dto == null)throw new IllegalArgumentException("The param was null");
         System.out.println("USERNAME: "+ dto.getUsername());
         UserDto serviceResult = userService.register(dto);
@@ -40,13 +46,13 @@ public class UserController {
 
     //Read(R)
     @GetMapping("/{username}")
-    public ResponseEntity<Map<String, Object>> findByUsername(@PathVariable("username") String username){
+    public ResponseEntity<Map<String, Object>> findByUsername(@PathVariable("username") @NotEmpty @Size(min = 4, max = 50) String username){
         return ResponseEntity.ok().body(userService.findByUsername(username));
     }
 
     //Update(U)
     @PutMapping("/disable")
-    public ResponseEntity<Void> disableUserByUsername(@RequestParam("username") String username){
+    public ResponseEntity<Void> disableUserByUsername(@RequestParam("username")  @NotEmpty @Size(min = 4, max = 50)String username){
         userService.disableUserByUsername(username);
         return ResponseEntity.noContent().build();
     }

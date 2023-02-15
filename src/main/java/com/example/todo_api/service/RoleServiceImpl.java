@@ -1,6 +1,7 @@
 package com.example.todo_api.service;
 
 import com.example.todo_api.exception.DataDuplicateException;
+import com.example.todo_api.exception.DataNotFoundException;
 import com.example.todo_api.model.dto.RoleDto;
 import com.example.todo_api.model.entity.Role;
 import com.example.todo_api.repository.RoleRepository;
@@ -35,9 +36,9 @@ public class RoleServiceImpl implements RoleService{
     public RoleDto create(RoleDto roleDto) {
         if (roleDto == null) throw new IllegalArgumentException("RoleDto was null");
         if(roleDto.getId() != 0)throw new IllegalArgumentException("role id should be noll or zero");
+        // todo: check the name that should not exist in the db....
 
         Role createdEntity = roleRepository.save( modelMapper.map(roleDto, Role.class));
-
         return modelMapper.map(createdEntity, RoleDto.class);
     }
 
@@ -57,11 +58,11 @@ public class RoleServiceImpl implements RoleService{
     public RoleDto findById(Integer roleId) {
         if (roleId == null) throw new IllegalArgumentException("Role id was null");
        Optional<Role> roleOption = roleRepository.findById(roleId);
-       if (roleOption.isPresent()){
-           Role entity = roleOption.get();
-          return modelMapper.map(entity, RoleDto.class);
-       }
-        return null;
+       if (!roleOption.isPresent()) throw new DataNotFoundException("role id was not valid");
+
+       Role entity = roleOption.get();
+       return modelMapper.map(entity, RoleDto.class);
+
     }
 
 

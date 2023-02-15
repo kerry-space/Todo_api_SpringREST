@@ -12,9 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/role")
+@Validated
 public class RoleController {
 
     //Controller is responsible for every request from outside and inside controller layer
@@ -45,7 +49,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Invalid request body", content = {@Content})
     })
     @PostMapping("/")
-    public ResponseEntity<RoleDto> create(@RequestBody RoleDto dto){
+    public ResponseEntity<RoleDto> create(@RequestBody @Valid RoleDto dto){
         RoleDto createdRoleDto = roleService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoleDto); // 201
     }
@@ -69,7 +73,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Invalid id supplied", content = {@Content})
     })
     @GetMapping("/{id}")
-    public ResponseEntity<RoleDto> findById(@PathVariable("id") Integer id){
+    public ResponseEntity<RoleDto> findById(@PathVariable("id") @Min(1) @Max(10) Integer id){
 
         return ResponseEntity.ok(roleService.findById(id));
     }
@@ -78,7 +82,7 @@ public class RoleController {
 
     //Upate(U)
     @PutMapping("/")
-    public ResponseEntity<Void> update(@RequestBody RoleDto dto){
+    public ResponseEntity<Void> update(@RequestBody @Valid RoleDto dto){
         roleService.update(dto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
